@@ -1,0 +1,6 @@
+.stack-work/
+saves/*
+*~
+.idea/
+out/*
+*.log
