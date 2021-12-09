@@ -36,15 +36,21 @@ server :: Server API
 server = handleAction :<|> handleSqrt
 
 handleAction :: String -> Double -> Double -> Handler ResponseScheme
-handleAction "add" first second = return $ ResponseScheme "add" [first, second] (Just $ first + second) Nothing
-handleAction "sub" first second = return $ ResponseScheme "sub" [first, second] (Just $ first - second) Nothing
-handleAction "mul" first second = return $ ResponseScheme "mul" [first, second] (Just $ first * second) Nothing
-handleAction "div" first second 
-  | second == 0 = return $ ResponseScheme "div" [first, second] Nothing (Just "Division by zero")
-  | otherwise   = return $ ResponseScheme "div" [first, second] (Just $ first / second) Nothing
-handleAction "pow" first second
-  | first == 0 && second < 0 = return $ ResponseScheme "pow" [first, second] Nothing (Just "Negative power of zero")
-  | otherwise                = return $ ResponseScheme "pow" [first, second] (Just $ first ** second) Nothing
+handleAction action first second
+  | action == "div" 
+    && second == 0  = return $ ResponseScheme "div" [first, second] Nothing (Just "Division by zero")
+  | action == "pow" 
+    && first == 0 
+    && second < 0   = return $ ResponseScheme "pow" [first, second] Nothing (Just "Negative power of zero")
+  | otherwise       = return $ ResponseScheme action [first, second] (Just $ calculate action first second) Nothing
+
+calculate :: String -> Double -> Double -> Double
+calculate action first second = case action of
+  "add" -> first + second
+  "sub" -> first - second
+  "mul" -> first * second
+  "div" -> first / second
+  "pow" -> first ** second
 
 handleSqrt :: Double -> Handler ResponseScheme
 handleSqrt value
