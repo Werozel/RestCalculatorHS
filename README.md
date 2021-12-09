@@ -1,4 +1,4 @@
-# rest-calculator-hs
+# Rest Calculator HS
 
 This is a rest-api calculator written in haskell using haskell-servant lib
 
