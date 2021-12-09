@@ -12,29 +12,25 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
 
-data User = User
-  { userId        :: Int
-  , userFirstName :: String
-  , userLastName  :: String
+data Reponse = Reponse
+  { operator   :: String
+  , arguments  :: [Double]
+  , result     :: Double
+  , error      :: String
   } deriving (Eq, Show)
 
-$(deriveJSON defaultOptions ''User)
-
-type API = "users" :> Get '[JSON] [User]
+$(deriveJSON defaultOptions ''Reponse)
 
 startApp :: IO ()
 startApp = run 8080 app
 
-app :: Application
-app = serve api server
+type API = Capture "action" String :> Capture "first" Double :> Capture "second" Double :> Get '[PlainText] String
 
-api :: Proxy API
-api = Proxy
+app :: Application
+app = serve (Proxy :: Proxy API) server
 
 server :: Server API
-server = return users
+server = handleAction
 
-users :: [User]
-users = [ User 1 "Isaac" "Newton"
-        , User 2 "Albert" "Einstein"
-        ]
+handleAction :: String -> Double -> Double -> Handler String
+handleAction action first second = return (action ++ show first ++ show second)
